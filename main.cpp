@@ -3,6 +3,7 @@
 #include "SchedulingWithDeadlines.h"
 #include "ModifiedSchedulingWithDeadlines.h"
 #include "greedy.h"
+#include "Hungarian.h"
 using namespace std;
 
 vector<Job> generateJobs(int n) {
@@ -50,30 +51,37 @@ int main() {
 //    }
 
 
+//    vector<vector<int>> assigning = {
+//            {10, 5, 5},
+//            {2, 4, 10},
+//            {5, 1, 7}
+//    };
+//    vector<int> bestTasks = findTasks(assigning);
+//    for (auto & jobs : assigning){
+//        for (auto & job : jobs){
+//            cout << " " << job << " ";
+//        }
+//        cout << "\n";
+//    }
+//    for (int i = 0; i < bestTasks.size(); i++){
+////        cout << "For worker " << i + 1 << " best work is: " << bestTasks[i] + 1 << "\n";
+//        for(int j = 0; j < bestTasks.size(); j++){
+//            if (j != bestTasks[i]){
+//                cout << " . ";
+//            }
+//            else{
+//                cout << " x ";
+//            }
+//        }
+//        cout << "\n";
+//    }
+//    cout << "\n";
+//    return 0;
     vector<vector<int>> assigning = {
-            {10, 5, 5},
-            {2, 4, 10},
-            {5, 1, 7}
+            {88, 55, 92, 14},
+            {66, 98, 86, 31},
+            {97, 22, 9, 49},
+            {15, 44, 25, 18}
     };
-    vector<int> bestTasks = findTasks(assigning);
-    for (auto & jobs : assigning){
-        for (auto & job : jobs){
-            cout << " " << job << " ";
-        }
-        cout << "\n";
-    }
-    for (int i = 0; i < bestTasks.size(); i++){
-//        cout << "For worker " << i + 1 << " best work is: " << bestTasks[i] + 1 << "\n";
-        for(int j = 0; j < bestTasks.size(); j++){
-            if (j != bestTasks[i]){
-                cout << " . ";
-            }
-            else{
-                cout << " x ";
-            }
-        }
-        cout << "\n";
-    }
-    cout << "\n";
-    return 0;
+    hungarianAlgorithm(assigning);
 }
