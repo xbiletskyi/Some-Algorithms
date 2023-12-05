@@ -5,5 +5,5 @@
 #include <iostream>
 #include <climits>
 using namespace std;
-vector<int> hungarianAlgorithm(vector<vector<int>> &costsMatrix);
+vector<int> hungarianAlgorithm(const vector<vector<int>> &costsMatrix);
 #endif //AZA_HUNGARIAN_H
