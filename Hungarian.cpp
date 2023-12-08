@@ -1,6 +1,5 @@
 #include "Hungarian.h"
 
-
 class HungarianMatrix{
 public:
     vector<vector<int>> matrix;
@@ -9,65 +8,58 @@ public:
     vector<int> minCols;
     vector<bool> coveredRows;
     vector<bool> coveredCols;
-    vector<vector<int>> zerosArr;
 
-    explicit HungarianMatrix(const vector<vector<int>> &costsMatrix) {
+    explicit HungarianMatrix(const vector<vector<int>> &costsMatrix) {  // O(n^2) complexity
         size = costsMatrix.size();
-        matrix.resize(size, vector<int>(size, 0));
-        minRows.resize(size, INT_MAX);
-        minCols.resize(size, INT_MAX);
-        coveredCols.resize(size, false);
-        coveredRows.resize(size, false);
-        zerosArr.resize(size, vector<int>(size, 0));
+        matrix.resize(size, vector<int>(size, 0));  // O(n) initialization
+        minRows.resize(size, INT_MAX);                       // O(n) initialization
+        minCols.resize(size, INT_MAX);                       // O(n) initialization
+        coveredCols.resize(size, false);                     // O(n) initialization
+        coveredRows.resize(size, false);                     // O(n) initialization
 
-        for (int i = 0; i < size; i++) {
+        for (int i = 0; i < size; i++) {        // O(n^2) complexity due to two nested for() loops
             for (int j = 0; j < size; j++) {
                 matrix[i][j] = costsMatrix[i][j];
                 minRows[i] = std::min(minRows[i], matrix[i][j]);
             }
         }
 
-        for (int i = 0; i < size; i++) {
+        for (int i = 0; i < size; i++) {        // O(n^2) complexity due to two nested for() loops
             for (int j = 0; j < size; j++) {
                 matrix[i][j] -= minRows[i];
                 minCols[j] = std::min(minCols[j], matrix[i][j]);
             }
         }
 
-        for (int i = 0; i < size; i++) {
+        for (int i = 0; i < size; i++) {        // O(n^2) complexity due to two nested for() loops
             for (int j = 0; j < size; j++) {
                 matrix[i][j] -= minCols[j];
             }
         }
     }
-    int maxZeros(int row, int col){
+    int maxZeros(int row, int col){     // O(n) complexity
         int vertical = 0;
         int horizontal = 0;
-        for (int i = 0; i < size; i ++){
-            if (matrix[row][i] == 0){
+        for (int i = 0; i < size; i ++){        // O(n) complexity (one for() loop)
+            if (matrix[row][i] == 0 && !coveredCols[i]){
                 horizontal++;
             }
         }
-        for (int i = 0; i < size; i++){
-            if (matrix[i][col] == 0){
+        for (int i = 0; i < size; i++){         // O(n) complexity (one for() loop)
+            if (matrix[i][col] == 0 && !coveredRows[i]){
                 vertical++;
             }
         }
         return vertical > horizontal ? vertical : -horizontal;
     }
-    int coverZeros(){
-        for (int i = 0; i < size; i++){
-            for (int j = 0; j < size; j++){
-                if (matrix[i][j] == 0){
-                    zerosArr[i][j] = maxZeros(i, j);
-                }
-            }
-        }
+    int coverZeros(){   // O(n^2) complexity on average
         int numLines = 0;
         for (int i = 0; i < size; ++i) {
             for (int j = 0; j < size; ++j) {
                 if (matrix[i][j] == 0 && !coveredRows[i] && !coveredCols[j]) {
-                    if (zerosArr[i][j] > 0){
+
+                    int zeros = maxZeros(i, j);     // O(n) function; executed n^2 times on worst case; n times on average
+                    if (zeros > 0){
                         coveredCols[j] = true;
                     }
                     else{
@@ -80,9 +72,9 @@ public:
         return numLines;
     }
 
-    void additionalZeros(){
+    void additionalZeros(){     // O(n^2) complexity
         int minima = INT_MAX;
-        for (int i = 0; i < size; i++){
+        for (int i = 0; i < size; i++){     // O(n^2) complexity
             if (!coveredRows[i]){
                 for (int j = 0; j < size; j++){
                     if (!coveredCols[j] && matrix[i][j] < minima){
@@ -91,7 +83,7 @@ public:
                 }
             }
         }
-        for (int i = 0; i < size; i++){
+        for (int i = 0; i < size; i++){     // O(n^2) complexity
             for (int j = 0; j < size; j++){
                 if (!coveredRows[i] && !coveredCols[j]){
                     matrix[i][j] -= minima;
@@ -101,13 +93,12 @@ public:
                 }
             }
         }
-        coveredRows.assign(size, false);
-        coveredCols.assign(size, false);
-        zerosArr.assign(size, vector<int>(size, 0));
+        coveredRows.assign(size, false);    // O(n) complexity
+        coveredCols.assign(size, false);    // O(n) complexity
     }
 
-    void countZeros(vector<int> & zerosRows, vector<int> & zerosCols, int & minRow, int & minCol){
-        for (int i = 0; i < size; i++){
+    void countZeros(vector<int> & zerosRows, vector<int> & zerosCols, int & minRow, int & minCol){  // O(n^2) complexity
+        for (int i = 0; i < size; i++){     // O(n^2) complexity (nested loop)
             for (int j = 0; j < size; j++){
                 if (matrix[i][j] == 0 && !coveredCols[j] && !coveredRows[i]){
                     zerosRows[i]++;
@@ -116,9 +107,10 @@ public:
             }
         }
         int minZeros = INT_MAX;
-        for (int i = 0; i < size; i++){
+        for (int i = 0; i < size; i++){     // O(n^2) complexity (nested loop)
             for (int j = 0; j < size; j++){
                 if (matrix[i][j] == 0 && !coveredRows[i] && !coveredCols[j] && (minZeros > zerosRows[i] || minZeros > zerosCols[j])){
+                    // condition to find the element in row or column with the least possibilities to assign a worker/job
                     minZeros = min(zerosRows[i], zerosCols[j]);
                     minCol = j;
                     minRow = i;
@@ -128,39 +120,33 @@ public:
 
     }
 };
-vector<int> hungarianAlgorithm(const vector<vector<int>> &costsMatrix){
+
+vector<int> hungarianAlgorithm(const vector<vector<int>> &costsMatrix){     // O(n^3) complexity
     int size = costsMatrix.size();
     vector<int> optimalJobs;
     optimalJobs.resize(size, -1);
     HungarianMatrix hungarianMat = HungarianMatrix(costsMatrix);
-    while (true) {
-        int numLines = hungarianMat.coverZeros();
+    while (true) {      // the fact the loop is infinite, however it cannot have more than n iterations due to adding zeros every time
+        int numLines = hungarianMat.coverZeros();   // O(n^2) complexity; executed n times
         if (numLines == size){
-            for (auto & row : hungarianMat.matrix){
-                for (auto & item : row){
-                    cout << item << " ";
-                }
-                cout << endl;
-            }
-
             vector<int> zerosRows;
             vector<int> zerosCols;
-            zerosRows.resize(size, 0);
-            zerosCols.resize(size, 0);
+            zerosRows.resize(size, 0);      // O(n) initialization complexity; executed once
+            zerosCols.resize(size, 0);      // O(n) initialization complexity; executed once
             int minCol = 0, minRow = 0;
-            hungarianMat.coveredCols.assign(size, false);
-            hungarianMat.coveredRows.assign(size, false);
+            hungarianMat.coveredCols.assign(size, false);   // O(n) assigning complexity; executed once
+            hungarianMat.coveredRows.assign(size, false);   // O(n) assigning complexity; executed once
             for (int i = 0; i < size; i++){
-                hungarianMat.countZeros(zerosRows, zerosCols, minRow, minCol);
+                hungarianMat.countZeros(zerosRows, zerosCols, minRow, minCol);  // O(n^2) complexity; executed n times
                 optimalJobs[minRow] = minCol;
                 hungarianMat.coveredRows[minRow] = true;
                 hungarianMat.coveredCols[minCol] = true;
-                zerosRows.assign(size, 0);
-                zerosCols.assign(size, 0);
+                zerosRows.assign(size, 0);  // O(n) assigning complexity; executed n times
+                zerosCols.assign(size, 0);  // O(n) assigning complexity; executed n times
             }
             break;
         }
-        hungarianMat.additionalZeros();
+        hungarianMat.additionalZeros();     // O(n^2) complexity; executed n times
     }
     return optimalJobs;
 }
